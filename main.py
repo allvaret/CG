@@ -1,70 +1,37 @@
 import pygame
-import sys
-
-# Inicialização padrão conforme Aula 03
-pygame.init()
-LARGURA, ALTURA = 640, 480
-tela = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Aula 03 - Algoritmo de Bresenham (Retas)")
-
-# Cores
-PRETO = (0, 0, 0)
-VERDE = (0, 255, 0)
-BRANCO = (255, 255, 255)
-LARANJA = (255, 165, 0)
-
 
 def desenha_reta_bresenham(tela, x1, y1, x2, y2, cor):
-    """
-    Implementação do Algoritmo de Bresenham para o primeiro octante.
-    Utiliza apenas aritmética inteira (objetivo da aula).
-    """
+    dx = abs(x2 - x1)
+    dy = abs(y2 - y1)
 
-    if x1 > x2:
-        dx = x1 - x2
-        x = x2
+    # Define direção do passo em x e y
+    sx = 1 if x1 < x2 else -1
+    sy = 1 if y1 < y2 else -1
+
+    x, y = x1, y1
+
+    # Caso dominante em X
+    if dx >= dy:
+        p = 2 * dy - dx
+        for _ in range(dx + 1):
+            tela.set_at((x, y), cor)
+            x += sx
+            if p >= 0:
+                y += sy
+                p += 2 * dy - 2 * dx
+            else:
+                p += 2 * dy
+
+    # Caso dominante em Y (troca os papéis de x e y)
     else:
-        dx = x2 - x1
-        x = x1
+        p = 2 * dx - dy
+        for _ in range(dy + 1):
+            tela.set_at((x, y), cor)
+            y += sy
+            if p >= 0:
+                x += sx
+                p += 2 * dx - 2 * dy
+            else:
+                p += 2 * dx
 
-    if y1 > y2:
-        dy = y1 - y2
-        y = y2
-    else:
-        dy = y2 - y1
-        y = y1
-
-    # Variável de decisão inicial (P)
-    p = 2 * dy - dx
-
-
-    # Plota o ponto inicial
-    tela.set_at((x, y), cor)
-
-    f_x = x
-    while x < (dx + f_x):
-        x += 1
-        if p < 0:
-            # Caso P < 0: pixel Leste (E)
-            p = p + 2 * dy
-        else:
-            # Caso P >= 0: pixel Nordeste (NE)
-            y += 1
-            p = p + 2 * dy - 2 * dx
-
-        tela.set_at((x, y), cor)
-
-
-# Loop Principal
-rodando = True
-while rodando:
-    for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
-            rodando = False
-
-    # Note que dx > dy para funcionar nesta versão simplificada (1º octante)
-    desenha_reta_bresenham(tela, 15, 15,600 ,480 , VERDE)
     pygame.display.flip()
-
-pygame.quit()
-sys.exit()
